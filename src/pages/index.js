@@ -1,4 +1,5 @@
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
+import { useSelector } from "react-redux";
 import Navbar from "../components/Navbar";
 import Profile from "../components/Profile";
 import Todo from "../components/Todo";
@@ -10,8 +11,13 @@ import {
 import withAuth from "../hoc/withAuth";
 
 function Home() {
+  const accessToken = useSelector((state) => state.user.accessToken);
   const [deleteTodo, { isLoading: isLoadingDelete }] = useDeleteTodoMutation();
-  const { data: todos = [], isLoading: isLoadingTodos } = useGetTodosQuery();
+  const {
+    data: todos = [],
+    isLoading: isLoadingTodos,
+    refetch: refetchTodos,
+  } = useGetTodosQuery();
 
   const sortedTodos = useMemo(() => {
     const sortedTodos = todos.slice();
@@ -21,6 +27,10 @@ function Home() {
     );
     return sortedTodos;
   }, [todos]);
+
+  useEffect(() => {
+    refetchTodos();
+  }, [accessToken, refetchTodos]);
 
   return (
     <>
