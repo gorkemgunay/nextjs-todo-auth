@@ -2,7 +2,7 @@ import { useState } from "react";
 import toast from "react-hot-toast";
 import { useCreateTodoMutation } from "../features/todo/todoApi";
 
-export default function TodoForm() {
+export default function TodoForm({ selectedCategory }) {
   const [todoText, setTodoText] = useState("");
   const [createTodo, { isLoading: isLoadingCreate }] = useCreateTodoMutation();
 
@@ -11,7 +11,10 @@ export default function TodoForm() {
       onSubmit={async (e) => {
         e.preventDefault();
         try {
-          await createTodo({ text: todoText }).unwrap();
+          await createTodo({
+            text: todoText,
+            categoryId: selectedCategory,
+          }).unwrap();
           toast.success("Todo created");
           setTodoText("");
         } catch (error) {

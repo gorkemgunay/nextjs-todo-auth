@@ -1,5 +1,4 @@
-import { useEffect, useMemo } from "react";
-import { useSelector } from "react-redux";
+import { useMemo, useState } from "react";
 import Navbar from "../components/Navbar";
 import Profile from "../components/Profile";
 import Todo from "../components/Todo";
@@ -10,49 +9,86 @@ import {
 } from "../features/todo/todoApi";
 import { useMeQuery } from "../features/user/userApi";
 import withAuth from "../hoc/withAuth";
+import { useGetCategoriesQuery } from "../features/category/categoryApi";
 
 function Home() {
-  const accessToken = useSelector((state) => state.user.accessToken);
+  const [selectedCategory, setSelectedCategory] = useState("all");
   const [deleteTodo, { isLoading: isLoadingDelete }] = useDeleteTodoMutation();
-  const { data: user, refetch: refetchMe } = useMeQuery();
-  const {
-    data: todos = [],
-    isLoading: isLoadingTodos,
-    refetch: refetchTodos,
-  } = useGetTodosQuery();
+  const { data: user } = useMeQuery();
+  const { data: todos = [], isLoading: isLoadingTodos } = useGetTodosQuery();
+  const { data: categories, isLoading: isLoadingCategories } =
+    useGetCategoriesQuery();
 
   const sortedTodos = useMemo(() => {
     const sortedTodos = todos.slice();
-    sortedTodos.sort(
-      (a, b) =>
-        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-    );
+    sortedTodos.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
     return sortedTodos;
   }, [todos]);
-
-  useEffect(() => {
-    refetchMe();
-    refetchTodos();
-  }, [accessToken, refetchTodos, todos, refetchMe]);
 
   return (
     <>
       <Navbar />
       <div className="max-w-2xl w-full mx-auto px-4 mt-10">
-        <Profile user={user} />
-        <div>
-          <TodoForm />
-        </div>
-        {!isLoadingTodos && (
-          <div className="flex flex-col gap-4 h-[40rem] overflow-y-scroll my-8 py-8">
-            {sortedTodos.map((todo) => (
-              <Todo
-                key={todo._id}
-                todo={todo}
-                deleteTodo={deleteTodo}
-                isLoadingDelete={isLoadingDelete}
-              />
+        <Profile
+          user={user}
+          selectedCategory={selectedCategory}
+          setSelectedCategory={setSelectedCategory}
+        />
+        {selectedCategory !== "all" && (
+          <div>
+            <TodoForm selectedCategory={selectedCategory} />
+          </div>
+        )}
+        <div className="flex items-center justify-center mt-16">
+          <div
+            onClick={() => setSelectedCategory("all")}
+            className={`p-2 w-48 flex items-center justify-center text-sm font-semibold border-b-2 border-transparent ${
+              selectedCategory === "all" && "border-b-blue-600"
+            } cursor-pointer transition-all`}
+          >
+            All
+          </div>
+          {!isLoadingCategories &&
+            categories.map((category) => (
+              <div
+                key={category._id}
+                onClick={() => setSelectedCategory(category._id)}
+                className={`p-2 w-48 flex items-center justify-center text-sm font-semibold border-b-2 border-transparent ${
+                  category._id === selectedCategory && "border-b-blue-600"
+                } cursor-pointer transition-all`}
+              >
+                {category.name}
+              </div>
             ))}
+        </div>
+        {!isLoadingTodos && todos.length === 0 && !isLoadingCategories && (
+          <div className="p-4 bg-yellow-100 text-yellow-600 rounded my-8">
+            {categories.length === 0
+              ? "There is no todo here. To create todo, first create category."
+              : "There is no todo here. Create one."}
+          </div>
+        )}
+        {!isLoadingTodos && (
+          <div className="flex flex-col gap-4 h-[36rem] overflow-y-scroll my-8 py-8">
+            {selectedCategory === "all" &&
+              sortedTodos.map((todo) => (
+                <Todo
+                  key={todo._id}
+                  todo={todo}
+                  deleteTodo={deleteTodo}
+                  isLoadingDelete={isLoadingDelete}
+                />
+              ))}
+            {sortedTodos
+              .filter((filterTodo) => filterTodo.category === selectedCategory)
+              .map((todo) => (
+                <Todo
+                  key={todo._id}
+                  todo={todo}
+                  deleteTodo={deleteTodo}
+                  isLoadingDelete={isLoadingDelete}
+                />
+              ))}
           </div>
         )}
       </div>

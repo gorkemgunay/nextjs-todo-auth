@@ -19,6 +19,13 @@ const UserSchema = mongoose.Schema(
       },
     ],
 
+    categories: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Category",
+      },
+    ],
+
     refreshToken: {
       type: String,
       select: false,

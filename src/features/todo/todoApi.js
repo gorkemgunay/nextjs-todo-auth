@@ -1,12 +1,10 @@
 import { apiSlice } from "../../apiSlice";
 
-const todoApiWithTags = apiSlice.enhanceEndpoints({ addTagTypes: ["Todo"] });
-
-const todoApi = todoApiWithTags.injectEndpoints({
+const todoApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     getTodos: builder.query({
       query: () => "/todo",
-      providesTags: ["Todo"],
+      providesTags: ["User", "Todo", "Category"],
     }),
     createTodo: builder.mutation({
       query: (payload) => ({
@@ -14,7 +12,16 @@ const todoApi = todoApiWithTags.injectEndpoints({
         method: "POST",
         body: payload,
       }),
-      invalidatesTags: ["Todo"],
+      invalidatesTags: ["User", "Todo"],
+      invalidatesTags: ["User", "Todo", "Category"],
+    }),
+    updateTodo: builder.mutation({
+      query: (payload) => ({
+        url: "/todo",
+        method: "PATCH",
+        body: payload,
+      }),
+      invalidatesTags: ["User", "Todo", "Category"],
     }),
     deleteTodo: builder.mutation({
       query: (payload) => ({
@@ -22,7 +29,7 @@ const todoApi = todoApiWithTags.injectEndpoints({
         method: "DELETE",
         body: payload,
       }),
-      invalidatesTags: ["Todo"],
+      invalidatesTags: ["User", "Todo", "Category"],
     }),
   }),
 });
@@ -30,6 +37,7 @@ const todoApi = todoApiWithTags.injectEndpoints({
 export const {
   useGetTodosQuery,
   useCreateTodoMutation,
+  useUpdateTodoMutation,
   useDeleteTodoMutation,
 } = todoApi;
 

@@ -7,9 +7,19 @@ const TodoSchema = mongoose.Schema(
       required: true,
     },
 
+    done: {
+      type: Boolean,
+      default: false,
+    },
+
     user: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
+    },
+
+    category: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Category",
     },
   },
   { timestamps: true }

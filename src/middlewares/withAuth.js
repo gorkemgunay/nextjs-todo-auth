@@ -12,18 +12,18 @@ const withAuth = (handler) => {
       return res.status(401).json({ message: "Unauthorized" });
     }
 
-    const payload = jwt.verify(
+    jwt.verify(
       token,
-      process.env.NEXT_PUBLIC_ACCESS_TOKEN_SECRET
+      process.env.NEXT_PUBLIC_ACCESS_TOKEN_SECRET,
+      (err, decoded) => {
+        if (err) {
+          return res.status(401).json({ message: "Unauthorized" });
+        }
+        req.payload = decoded;
+
+        return handler(req, res);
+      }
     );
-
-    if (!payload) {
-      return res.status(401).json({ message: "Unauthorized" });
-    }
-
-    req.payload = payload;
-
-    return handler(req, res);
   };
 };
 

@@ -1,8 +1,6 @@
 import { apiSlice } from "../../apiSlice";
 
-const userApiWithTags = apiSlice.enhanceEndpoints({ addTagTypes: ["User"] });
-
-const userApi = userApiWithTags.injectEndpoints({
+const userApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     register: builder.mutation({
       query: (payload) => ({
