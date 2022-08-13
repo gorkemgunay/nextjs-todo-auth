@@ -1,25 +1,22 @@
 import { useRouter } from "next/router";
 import toast from "react-hot-toast";
 import { useDispatch } from "react-redux";
-import { useGetTodosQuery } from "../features/todo/todoApi";
-import { useLogoutMutation, useMeQuery } from "../features/user/userApi";
+import { useLogoutMutation } from "../features/user/userApi";
 import { clearAccessToken } from "../features/user/userSlice";
 
-export default function Profile() {
+export default function Profile({ user }) {
   const [logout] = useLogoutMutation();
-  const { data: user } = useMeQuery();
-  const { data: todos, isLoading: isLoadingTodos } = useGetTodosQuery();
   const router = useRouter();
   const dispatch = useDispatch();
 
   return (
     <div className="flex items-center justify-center flex-col gap-4 pb-10">
       <h2 className="text-xl font-semibold">{user.email}</h2>
-      {!isLoadingTodos && todos.length !== 0 && todos.length > 1 && (
-        <h4 className="text-sm font-semibold">{todos.length} todos</h4>
+      {user.todos.length > 1 && (
+        <h4 className="text-sm font-semibold">{user.todos.length} todos</h4>
       )}
-      {!isLoadingTodos && todos.length !== 0 && todos.length === 1 && (
-        <h4 className="text-sm font-semibold">{todos.length} todo</h4>
+      {user.todos.length === 1 && (
+        <h4 className="text-sm font-semibold">{user.todos.length} todo</h4>
       )}
       <button
         type="button"

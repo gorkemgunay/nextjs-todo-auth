@@ -8,11 +8,13 @@ import {
   useDeleteTodoMutation,
   useGetTodosQuery,
 } from "../features/todo/todoApi";
+import { useMeQuery } from "../features/user/userApi";
 import withAuth from "../hoc/withAuth";
 
 function Home() {
   const accessToken = useSelector((state) => state.user.accessToken);
   const [deleteTodo, { isLoading: isLoadingDelete }] = useDeleteTodoMutation();
+  const { data: user, refetch: refetchMe } = useMeQuery();
   const {
     data: todos = [],
     isLoading: isLoadingTodos,
@@ -29,14 +31,15 @@ function Home() {
   }, [todos]);
 
   useEffect(() => {
+    refetchMe();
     refetchTodos();
-  }, [accessToken, refetchTodos]);
+  }, [accessToken, refetchTodos, todos, refetchMe]);
 
   return (
     <>
       <Navbar />
       <div className="max-w-2xl w-full mx-auto px-4 mt-10">
-        <Profile />
+        <Profile user={user} />
         <div>
           <TodoForm />
         </div>

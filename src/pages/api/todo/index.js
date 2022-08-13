@@ -1,6 +1,7 @@
 import db from "../../../lib/db";
 import withAuth from "../../../middlewares/withAuth";
 import Todo from "../../../models/todo";
+import User from "../../../models/user";
 
 async function handler(req, res) {
   const { method } = req;
@@ -16,11 +17,17 @@ async function handler(req, res) {
       if (!req.body.text) {
         return res.status(400).json({ message: "Todo text is required" });
       }
+      const user = await User.findById(userId);
+      if (!user) {
+        return res.status(401).json({ message: "Unauthorized" });
+      }
       const createdTodo = await Todo.create({
         text: req.body.text,
         user: userId,
       });
       if (createdTodo) {
+        user.todos.push(createdTodo._id);
+        await user.save();
         return res.status(200).json(createdTodo);
       }
       return res.status(400).json({ message: "Bad request" });
@@ -33,7 +40,10 @@ async function handler(req, res) {
         _id: req.body.todoId,
         user: userId,
       });
-      if (deletedTodo) {
+      const deleteUserTodo = await User.findByIdAndUpdate(userId, {
+        $pull: { todos: deletedTodo._id },
+      });
+      if (deletedTodo && deleteUserTodo) {
         return res.status(200).json(deletedTodo);
       }
       return res.status(400).json({ message: "Bad request" });
