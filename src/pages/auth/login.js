@@ -10,8 +10,8 @@ function Login() {
   const [email, setEmail] = useState("gorkem@gg.com");
   const [password, setPassword] = useState("123123");
   const [login, { isLoading }] = useLoginMutation();
-  const dispatch = useDispatch();
   const router = useRouter();
+  const dispatch = useDispatch();
 
   return (
     <div className="h-screen w-full flex items-center justify-center flex-col gap-4 max-w-2xl mx-auto">
@@ -21,13 +21,12 @@ function Login() {
       <form
         onSubmit={async (e) => {
           e.preventDefault();
-          const response = await login({ email, password });
-          if (response.data && !isLoading) {
-            dispatch(setAccessToken({ accessToken: response.accessToken }));
+          try {
+            const response = await login({ email, password }).unwrap();
+            dispatch(setAccessToken(response.accessToken));
             return router.push("/");
-          }
-          if (response.error) {
-            toast.error(response.error.data.message);
+          } catch (error) {
+            toast.error(error.data.message);
           }
         }}
         className="flex flex-col gap-4 w-full px-4"
@@ -48,7 +47,7 @@ function Login() {
         <button
           type="submit"
           disabled={isLoading}
-          className="flex items-center justify-center h-10 px-2 text-sm bg-blue-600 text-gray-50 font-semibold rounded disabled:cursor-not-allowed disabled:bg-blue-100 disabled:text-blue-600"
+          className="flex items-center justify-center h-10 px-2 rounded text-sm font-semibold bg-blue-100 text-blue-600 transition hover:bg-blue-600 hover:text-white hover:shadow-lg hover:shadow-blue-600/20 hover:-translate-y-1 disabled:cursor-not-allowed"
         >
           Login
         </button>

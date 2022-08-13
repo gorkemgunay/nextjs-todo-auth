@@ -1,9 +1,12 @@
 import { apiSlice } from "../../apiSlice";
 
-const todoApi = apiSlice.injectEndpoints({
+const todoApiWithTags = apiSlice.enhanceEndpoints({ addTagTypes: ["Todo"] });
+
+const todoApi = todoApiWithTags.injectEndpoints({
   endpoints: (builder) => ({
     getTodos: builder.query({
       query: () => "/todo",
+      providesTags: ["Todo"],
     }),
     createTodo: builder.mutation({
       query: (payload) => ({
@@ -11,6 +14,7 @@ const todoApi = apiSlice.injectEndpoints({
         method: "POST",
         body: payload,
       }),
+      invalidatesTags: ["Todo"],
     }),
     deleteTodo: builder.mutation({
       query: (payload) => ({
@@ -18,6 +22,7 @@ const todoApi = apiSlice.injectEndpoints({
         method: "DELETE",
         body: payload,
       }),
+      invalidatesTags: ["Todo"],
     }),
   }),
 });

@@ -1,6 +1,8 @@
 import { apiSlice } from "../../apiSlice";
 
-const userApi = apiSlice.injectEndpoints({
+const userApiWithTags = apiSlice.enhanceEndpoints({ addTagTypes: ["User"] });
+
+const userApi = userApiWithTags.injectEndpoints({
   endpoints: (builder) => ({
     register: builder.mutation({
       query: (payload) => ({
@@ -8,6 +10,7 @@ const userApi = apiSlice.injectEndpoints({
         method: "POST",
         body: payload,
       }),
+      invalidatesTags: ["User"],
     }),
     login: builder.mutation({
       query: (payload) => ({
@@ -15,15 +18,19 @@ const userApi = apiSlice.injectEndpoints({
         method: "POST",
         body: payload,
       }),
+      invalidatesTags: ["User"],
     }),
     refreshToken: builder.query({
       query: () => "/auth/refresh-token",
+      providesTags: ["User"],
     }),
     me: builder.query({
       query: () => "/auth/me",
+      providesTags: ["User"],
     }),
     logout: builder.mutation({
       query: () => "/auth/logout",
+      invalidatesTags: ["User"],
     }),
   }),
 });

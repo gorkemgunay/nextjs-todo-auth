@@ -5,7 +5,6 @@ import db from "../../../lib/db";
 
 export default async function handler(req, res) {
   const { method } = req;
-
   await db();
 
   switch (method) {
@@ -29,23 +28,27 @@ export default async function handler(req, res) {
       const userId = uid.userId;
       const user = await User.findById(userId).select("+refreshToken");
 
-      const newAccessToken = jwt.sign(
-        { userId: user._id },
-        process.env.NEXT_PUBLIC_ACCESS_TOKEN_SECRET,
-        { expiresIn: "15m" }
-      );
+      if (user) {
+        const newAccessToken = jwt.sign(
+          { userId: user._id },
+          process.env.NEXT_PUBLIC_ACCESS_TOKEN_SECRET,
+          { expiresIn: "15m" }
+        );
 
-      const newRefreshToken = jwt.sign(
-        { userId: user._id },
-        process.env.NEXT_PUBLIC_REFRESH_TOKEN_SECRET,
-        { expiresIn: "7d" }
-      );
-      user.refreshToken = newRefreshToken;
-      await user.save();
-      cookies.set("uid", newRefreshToken, {
-        httpOnly: true,
-      });
-      return res.status(200).json({ accessToken: newAccessToken });
+        const newRefreshToken = jwt.sign(
+          { userId: user._id },
+          process.env.NEXT_PUBLIC_REFRESH_TOKEN_SECRET,
+          { expiresIn: "7d" }
+        );
+        user.refreshToken = newRefreshToken;
+        await user.save();
+        cookies.set("uid", newRefreshToken, {
+          httpOnly: true,
+        });
+        return res.status(200).json({ accessToken: newAccessToken });
+      }
+
+      return res.status(401).json({ message: "Unauthorized" });
 
     default:
       return res

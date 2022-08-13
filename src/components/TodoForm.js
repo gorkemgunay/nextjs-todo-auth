@@ -1,27 +1,21 @@
 import { useState } from "react";
 import toast from "react-hot-toast";
-import {
-  useCreateTodoMutation,
-  useGetTodosQuery,
-} from "../features/todo/todoApi";
+import { useCreateTodoMutation } from "../features/todo/todoApi";
 
 export default function TodoForm() {
   const [todoText, setTodoText] = useState("");
-  const { refetch: refetchTodos } = useGetTodosQuery();
   const [createTodo, { isLoading: isLoadingCreate }] = useCreateTodoMutation();
 
   return (
     <form
       onSubmit={async (e) => {
         e.preventDefault();
-        const response = await createTodo({ text: todoText });
-        if (response.data && !isLoadingCreate) {
+        try {
+          await createTodo({ text: todoText }).unwrap();
           toast.success("Todo created");
           setTodoText("");
-          refetchTodos();
-        }
-        if (response.error) {
-          toast.error(response.error.data.message);
+        } catch (error) {
+          toast.error(error.data.message);
         }
       }}
       className="flex items-center gap-4"
@@ -34,7 +28,7 @@ export default function TodoForm() {
       />
       <button
         disabled={isLoadingCreate || !todoText}
-        className="flex items-center h-10 px-2 rounded text-sm font-semibold bg-blue-100 text-blue-600 transition hover:bg-blue-600 hover:text-white hover:shadow-lg hover:shadow-blue-600/20 hover:-translate-y-1 disabled:cursor-not-allowed whitespace-nowrap"
+        className="flex items-center justify-center h-10 px-2 rounded text-sm font-semibold bg-blue-100 text-blue-600 transition hover:bg-blue-600 hover:text-white hover:shadow-lg hover:shadow-blue-600/20 hover:-translate-y-1 disabled:cursor-not-allowed whitespace-nowrap"
       >
         Add Todo
       </button>

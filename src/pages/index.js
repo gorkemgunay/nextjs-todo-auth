@@ -1,5 +1,4 @@
-import { useEffect } from "react";
-import { useSelector } from "react-redux";
+import { useMemo } from "react";
 import Navbar from "../components/Navbar";
 import Profile from "../components/Profile";
 import Todo from "../components/Todo";
@@ -8,23 +7,20 @@ import {
   useDeleteTodoMutation,
   useGetTodosQuery,
 } from "../features/todo/todoApi";
-import { useMeQuery } from "../features/user/userApi";
 import withAuth from "../hoc/withAuth";
 
 function Home() {
-  const accessToken = useSelector((state) => state.user.accessToken);
   const [deleteTodo, { isLoading: isLoadingDelete }] = useDeleteTodoMutation();
-  const { refetch: refetchMe } = useMeQuery();
-  const {
-    data: todos,
-    isLoading: isLoadingTodos,
-    refetch: refetchTodos,
-  } = useGetTodosQuery();
+  const { data: todos = [], isLoading: isLoadingTodos } = useGetTodosQuery();
 
-  useEffect(() => {
-    refetchMe();
-    refetchTodos();
-  }, [accessToken, refetchMe, refetchTodos]);
+  const sortedTodos = useMemo(() => {
+    const sortedTodos = todos.slice();
+    sortedTodos.sort(
+      (a, b) =>
+        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    );
+    return sortedTodos;
+  }, [todos]);
 
   return (
     <>
@@ -36,12 +32,11 @@ function Home() {
         </div>
         {!isLoadingTodos && (
           <div className="flex flex-col gap-4 h-[40rem] overflow-y-scroll my-8 py-8">
-            {todos.map((todo) => (
+            {sortedTodos.map((todo) => (
               <Todo
                 key={todo._id}
                 todo={todo}
                 deleteTodo={deleteTodo}
-                refetchTodos={refetchTodos}
                 isLoadingDelete={isLoadingDelete}
               />
             ))}

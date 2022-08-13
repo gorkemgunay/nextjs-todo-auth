@@ -14,7 +14,7 @@ const withAuth = (handler) => {
 
     const payload = jwt.verify(
       token,
-      process.env.NEXT_PUBLIC_ACCESS_TOKEN_SECRET,
+      process.env.NEXT_PUBLIC_ACCESS_TOKEN_SECRET
     );
 
     if (!payload) {

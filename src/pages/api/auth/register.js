@@ -5,6 +5,7 @@ import User from "../../../models/user";
 export default async function handler(req, res) {
   const { method } = req;
   await db();
+
   switch (method) {
     case "POST":
       const email = await User.findOne({ email: req.body.email });

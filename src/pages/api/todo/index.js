@@ -26,12 +26,17 @@ async function handler(req, res) {
       return res.status(400).json({ message: "Bad request" });
 
     case "DELETE":
+      if (!req.body.todoId) {
+        return res.status(400).json({ message: "Todo id is required" });
+      }
       const deletedTodo = await Todo.findOneAndDelete({
         _id: req.body.todoId,
         user: userId,
       });
-      return res.status(200).json(deletedTodo);
-
+      if (deletedTodo) {
+        return res.status(200).json(deletedTodo);
+      }
+      return res.status(400).json({ message: "Bad request" });
     default:
       return res
         .status(405)

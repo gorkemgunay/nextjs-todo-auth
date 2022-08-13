@@ -10,7 +10,10 @@ async function handler(req, res) {
     case "GET":
       const { userId } = req.payload;
       const user = await User.findById(userId);
-      return res.status(200).json(user);
+      if (user) {
+        return res.status(200).json(user);
+      }
+      return res.status(401).json({ message: "Unauthorized" });
     default:
       return res
         .status(405)

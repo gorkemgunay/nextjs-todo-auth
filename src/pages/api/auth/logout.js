@@ -5,19 +5,21 @@ import Cookies from "cookies";
 
 async function handler(req, res) {
   const { method } = req;
-
   await db();
 
   switch (method) {
     case "GET":
       const { userId } = req.payload;
       const user = await User.findById(userId);
-      user.refreshToken = null;
-      await user.save();
-      const cookies = new Cookies(req, res);
-      cookies.set("uid");
+      if (user) {
+        user.refreshToken = null;
+        await user.save();
+        const cookies = new Cookies(req, res);
+        cookies.set("uid");
 
-      return res.status(200).json({ message: "Successfully logout" });
+        return res.status(200).json({ message: "Successfully logout" });
+      }
+      return res.status(401).json({ message: "Unauthorized" });
     default:
       return res
         .status(405)
