@@ -5,6 +5,7 @@ import toast from "react-hot-toast";
 import { useDispatch } from "react-redux";
 import { useLoginMutation } from "../../features/user/userApi";
 import { setAccessToken } from "../../features/user/userSlice";
+import withRedirect from "../../hoc/withRedirect";
 
 function Login() {
   const [email, setEmail] = useState("gorkem@gg.com");
@@ -24,6 +25,7 @@ function Login() {
           try {
             const response = await login({ email, password }).unwrap();
             dispatch(setAccessToken(response.accessToken));
+            toast.success("Successfully login");
             return router.push("/");
           } catch (error) {
             toast.error(error.data.message);
@@ -62,4 +64,4 @@ function Login() {
   );
 }
 
-export default Login;
+export default withRedirect(Login);

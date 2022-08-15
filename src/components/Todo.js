@@ -7,21 +7,20 @@ export default function Todo({ todo, deleteTodo, isLoadingDelete }) {
   const [updateTodo, { isLoading }] = useUpdateTodoMutation();
   dayjs.extend(relativeTime);
   return (
-    <button
-      onClick={async () => {
-        try {
-          await updateTodo({ todoId: todo._id });
-        } catch (error) {
-          toast.error(error.data.message);
-        }
-      }}
-      disabled={isLoading}
+    <div
       className={`flex items-center justify-between gap-4 p-6 ${
         todo.done ? "bg-gray-100" : "bg-white"
       } rounded-lg transition hover:shadow-lg hover:-translate-y-1`}
     >
       <div
-        className={`text-sm font-semibold break-words whitespace-normal ${
+        onClick={async () => {
+          try {
+            await updateTodo({ todoId: todo._id });
+          } catch (error) {
+            toast.error(error.data.message);
+          }
+        }}
+        className={`w-full text-sm font-semibold break-words whitespace-normal cursor-pointer ${
           todo.done && "line-through"
         }`}
       >
@@ -50,6 +49,6 @@ export default function Todo({ todo, deleteTodo, isLoadingDelete }) {
           Delete
         </button>
       </div>
-    </button>
+    </div>
   );
 }

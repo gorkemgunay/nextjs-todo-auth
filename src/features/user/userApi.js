@@ -24,11 +24,14 @@ const userApi = apiSlice.injectEndpoints({
     }),
     me: builder.query({
       query: () => "/auth/me",
-      providesTags: ["User"],
+      providesTags: ["User", "UserLogout"],
     }),
     logout: builder.mutation({
-      query: () => "/auth/logout",
-      invalidatesTags: ["User"],
+      query: () => ({
+        url: "/auth/logout",
+        method: "POST",
+      }),
+      invalidatesTags: ["UserLogout"],
     }),
   }),
 });

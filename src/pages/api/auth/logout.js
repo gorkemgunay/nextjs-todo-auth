@@ -8,7 +8,7 @@ async function handler(req, res) {
   await db();
 
   switch (method) {
-    case "GET":
+    case "POST":
       const { userId } = req.payload;
       const user = await User.findById(userId);
       if (user) {

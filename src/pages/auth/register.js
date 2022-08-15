@@ -3,6 +3,7 @@ import { useRouter } from "next/router";
 import { useState } from "react";
 import toast from "react-hot-toast";
 import { useRegisterMutation } from "../../features/user/userApi";
+import withRedirect from "../../hoc/withRedirect";
 
 function Register() {
   const [email, setEmail] = useState("");
@@ -58,4 +59,4 @@ function Register() {
   );
 }
 
-export default Register;
+export default withRedirect(Register);

@@ -51,17 +51,22 @@ async function handler(req, res) {
 
     case "PATCH":
       if (!req.body.todoId) {
+        console.log("error1");
         return res.status(400).json({ message: "Todo id is required" });
       }
       const todo = await Todo.findOne({ _id: req.body.todoId, user: userId });
       if (todo) {
         const updatedTodo = await Todo.findOneAndUpdate(
           { _id: req.body.todoId, user: userId },
-          { done: !todo.done }
+          { done: !todo.done },
+          { new: true }
         );
+        console.log("updatedTodo");
         if (updatedTodo) {
+          console.log("return");
           return res.status(200).json(updatedTodo);
         }
+        console.log("error2");
         return res.status(400).json({ message: "Bad request" });
       }
       return res.status(400).json({ message: "Bad request" });

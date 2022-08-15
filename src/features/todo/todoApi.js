@@ -12,7 +12,6 @@ const todoApi = apiSlice.injectEndpoints({
         method: "POST",
         body: payload,
       }),
-      invalidatesTags: ["User", "Todo"],
       invalidatesTags: ["User", "Todo", "Category"],
     }),
     updateTodo: builder.mutation({
