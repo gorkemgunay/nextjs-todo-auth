@@ -1,10 +1,16 @@
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import toast from "react-hot-toast";
-import { useUpdateTodoMutation } from "../features/todo/todoApi";
+import {
+  useDeleteTodoMutation,
+  useUpdateTodoMutation,
+} from "../features/todo/todoApi";
 
-export default function Todo({ todo, deleteTodo, isLoadingDelete }) {
-  const [updateTodo, { isLoading }] = useUpdateTodoMutation();
+export default function Todo({ todo }) {
+  const [deleteTodo, { isLoading: isLoadingDeleteTodo }] =
+    useDeleteTodoMutation();
+  const [updateTodo, { isLoading: isLoadingUpdateTodo }] =
+    useUpdateTodoMutation();
   dayjs.extend(relativeTime);
   return (
     <div
@@ -32,7 +38,7 @@ export default function Todo({ todo, deleteTodo, isLoadingDelete }) {
         </small>
         <button
           type="button"
-          disabled={isLoadingDelete || isLoading}
+          disabled={isLoadingDeleteTodo || isLoadingUpdateTodo}
           onClick={async () => {
             try {
               await deleteTodo({

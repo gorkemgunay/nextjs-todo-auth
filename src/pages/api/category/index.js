@@ -25,12 +25,9 @@ async function handler(req, res) {
       }
 
       if (user.categories.length === 3) {
-        return res
-          .status(401)
-          .json({
-            message:
-              "You have reached the maximum number of category creations",
-          });
+        return res.status(400).json({
+          message: "You have reached the maximum number of category creations",
+        });
       }
 
       const createdCategory = await Category.create({

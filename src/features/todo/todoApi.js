@@ -6,6 +6,10 @@ const todoApi = apiSlice.injectEndpoints({
       query: () => "/todo",
       providesTags: ["User", "Todo", "Category"],
     }),
+    getTodosByCategory: builder.query({
+      query: (categoryId) => ({ url: `/todo/${categoryId}` }),
+      providesTags: ["User", "Todo", "Category"],
+    }),
     createTodo: builder.mutation({
       query: (payload) => ({
         url: "/todo",
@@ -35,6 +39,7 @@ const todoApi = apiSlice.injectEndpoints({
 
 export const {
   useGetTodosQuery,
+  useGetTodosByCategoryQuery,
   useCreateTodoMutation,
   useUpdateTodoMutation,
   useDeleteTodoMutation,

@@ -7,11 +7,7 @@ import { clearAccessToken } from "../features/user/userSlice";
 import CreateCategory from "../components/CreateCategory";
 import { useDeleteCategoryMutation } from "../features/category/categoryApi";
 
-export default function Profile({
-  user,
-  selectedCategory,
-  setSelectedCategory,
-}) {
+export default function Profile({ user, selectedCategory }) {
   const [deleteCategory, { isLoading: isLoadingDeleteCategory }] =
     useDeleteCategoryMutation();
   const [showCreateCategory, setShowCreateCategory] = useState(false);
@@ -53,7 +49,7 @@ export default function Profile({
           </div>
         </div>
         <div className="flex items-center gap-4">
-          {selectedCategory === "all" && (
+          {!selectedCategory && (
             <button
               type="button"
               onClick={() => setShowCreateCategory(true)}
@@ -62,7 +58,7 @@ export default function Profile({
               Create Category
             </button>
           )}
-          {selectedCategory !== "all" && (
+          {selectedCategory && (
             <button
               type="button"
               disabled={isLoadingDeleteCategory}
@@ -71,7 +67,7 @@ export default function Profile({
                   await deleteCategory({
                     categoryId: selectedCategory,
                   }).unwrap();
-                  setSelectedCategory("all");
+                  router.push("/");
                   toast.success("Category deleted");
                 } catch (error) {
                   toast.error(error.data.message);
