@@ -1,5 +1,6 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { clearAccessToken, setAccessToken } from "./features/user/userSlice";
+import { toggleLoading } from "./features/loader/loaderSlice";
 
 const baseQuery = fetchBaseQuery({
   baseUrl: process.env.NEXT_PUBLIC_URL,
@@ -13,6 +14,7 @@ const baseQuery = fetchBaseQuery({
 });
 
 const baseQueryWithReauth = async (args, api, extraOptions) => {
+  api.dispatch(toggleLoading(true));
   let result = await baseQuery(args, api, extraOptions);
   if (result.error && result.error.status === 401) {
     const tokens = await baseQuery("/auth/refresh-token", api, extraOptions);
@@ -23,6 +25,7 @@ const baseQueryWithReauth = async (args, api, extraOptions) => {
       api.dispatch(clearAccessToken());
     }
   }
+  api.dispatch(toggleLoading(false));
   return result;
 };
 
