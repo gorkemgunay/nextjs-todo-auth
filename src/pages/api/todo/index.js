@@ -51,7 +51,6 @@ async function handler(req, res) {
 
     case "PATCH":
       if (!req.body.todoId) {
-        console.log("error1");
         return res.status(400).json({ message: "Todo id is required" });
       }
       const todo = await Todo.findOne({ _id: req.body.todoId, user: userId });
@@ -61,12 +60,9 @@ async function handler(req, res) {
           { done: !todo.done },
           { new: true }
         );
-        console.log("updatedTodo");
         if (updatedTodo) {
-          console.log("return");
           return res.status(200).json(updatedTodo);
         }
-        console.log("error2");
         return res.status(400).json({ message: "Bad request" });
       }
       return res.status(400).json({ message: "Bad request" });
@@ -84,20 +80,22 @@ async function handler(req, res) {
         _id: req.body.todoId,
         user: userId,
       });
-      const deleteUserTodo = await User.findByIdAndUpdate(userId, {
-        $pull: { todos: deletedTodo._id },
-      });
 
-      const deleteCategoryTodo = await Category.findOneAndUpdate(
-        {
-          _id: req.body.categoryId,
-          user: userId,
-        },
-        { $pull: { todos: req.body.todoId } }
-      );
-      if (deletedTodo && deleteUserTodo && deleteCategoryTodo) {
+      if (deletedTodo) {
+        await User.findByIdAndUpdate(userId, {
+          $pull: { todos: deletedTodo._id },
+        });
+
+        await Category.findOneAndUpdate(
+          {
+            _id: req.body.categoryId,
+            user: userId,
+          },
+          { $pull: { todos: req.body.todoId } }
+        );
         return res.status(200).json(deletedTodo);
       }
+
       return res.status(400).json({ message: "Bad request" });
     default:
       return res
